@@ -37,12 +37,20 @@ func (ll LogLevel) MarshalText() (text []byte, err error) {
 }
 
 func (ll *LogLevel) UnmarshalText(text []byte) error {
-	s := string(text)
+	l, err := ParseLogLevel(string(text))
+	if err != nil {
+		return err
+	}
+	*ll = l
+	return nil
+}
+
+func ParseLogLevel(level string) (LogLevel, error) {
+	level = strings.TrimSpace(level)
 	for i, name := range logLevelNames {
-		if strings.EqualFold(name, s) {
-			*ll = LogLevel(i)
-			return nil
+		if strings.EqualFold(name, level) {
+			return LogLevel(i), nil
 		}
 	}
-	return fmt.Errorf("unknown log level: %s", s)
+	return 0, fmt.Errorf("unknown log level: %s", level)
 }
